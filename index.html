@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carga de archivos</title>
+ <style>
+  
+body {
+  font-family: 'Roboto', sans-serif;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #000;
+  color: #fff;
+}
+
+h1 {
+  text-align: center;
+  color: #0af;
+  font-size: 30px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+form {
+  margin-top: 20px;
+}
+
+input[type="file"] {
+  display: block;
+  margin-bottom: 20px;
+  border: none;
+  border-bottom: 2px solid #0af;
+  background-color: transparent;
+  color: #0af;
+  font-size: 16px;
+  padding: 10px;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+
+input[type="file"]:focus {
+  outline: none;
+  border-color: #f0f;
+}
+
+input[type="submit"] {
+  background-color: #0af;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+  background-color: #f0f;
+}
+
+#file-info {
+  margin-top: 40px;
+  border-top: 2px solid #0af;
+  padding-top: 40px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#file-info.show {
+  opacity: 1;
+}
+
+p {
+  margin-bottom: 10px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #0af;
+  margin: 30px 0;
+}
+ </style>
+</head>
+<body>
+  <h1>Carga de archivos</h1>
+  
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" multiple />
+    <input type="submit" value="Cargar" />
+  </form>
+
+  <div id="file-info"></div>
+
+  <script>
+    // Script para mostrar los detalles de los archivos cargados
+    const form = document.querySelector('form');
+    const fileInfoDiv = document.querySelector('#file-info');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const filesInfo = await response.json();
+        let html = '';
+        filesInfo.forEach(fileInfo => {
+          html += `
+            <p>Nombre: ${fileInfo.filename}</p>
+            <p>Nombre original: ${fileInfo.originalname}</p>
+            <p>Tamaño: ${fileInfo.size} bytes</p>
+            <p>Tipo MIME: ${fileInfo.mimetype}</p>
+            <hr>
+          `;
+        });
+        fileInfoDiv.innerHTML = html;
+        fileInfoDiv.classList.add('show');
+      } else {
+        fileInfoDiv.innerHTML = 'Error al cargar los archivos.';
+      }
+    });
+  </script>
+</body>
+</html>
